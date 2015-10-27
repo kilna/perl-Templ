@@ -7,7 +7,7 @@ push @ISA, 'Exporter';
 use strict;
 use warnings;
 
-our $VERSION = '0.02_01';
+our $VERSION = '0.03_01';
 
 use Templ::Template;
 sub templ (@) { Templ::Template->get( @_ ) }

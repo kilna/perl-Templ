@@ -10,13 +10,11 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Templ.pm',
   'PREREQ_PM' => {
                    'Scalar::Util' => 0,
-                   'URI::Escape' => 0,
                    'FindBin' => 0,
                    'Symbol' => 0,
                    'Exporter' => 0,
                    'Carp' => 0,
                    'Test::More' => 0,
-                   'HTML::Entities' => 0,
                    'Digest::MD5' => 0,
                    'File::Spec::Functions' => 0
                  }
