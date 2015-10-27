@@ -1,0 +1,14 @@
+Perldoc:
+    Templ
+	Templ::Here
+	Templ::Parser
+	Templ::Tag
+	Templ::Template
+	Templ::Util
+	Templ::Filter::HTML
+	Templ::Tag::Comment
+	Templ::Tag::Filter
+	Templ::Tag::Perl
+	Templ::Tag::Print
+	Templ::Template::Basic
+	Templ::Template::HTML	
