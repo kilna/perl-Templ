@@ -14,11 +14,10 @@ lib/Templ/Template.pm
 lib/Templ/Template/Basic.pm
 lib/Templ/Template/HTML.pm
 lib/Templ/Util.pm
+LICENSE
 MANIFEST
 README
 t/main.t
 t/main.templ
 TODO
 Makefile.PL
-META.yml
-META.json
