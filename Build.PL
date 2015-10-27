@@ -5,32 +5,29 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'Templ',
-    license             => 'artistic_2',
-    dist_author         => q{Anthony Kilna <anthony@kilna.com>},
+    license             => 'perl',
+    dist_author         => q{Anthony Kilna <kilna@kilna.com>},
     dist_version_from   => 'lib/Templ.pm',
     dist_abstract       => 'A lightweight, pure perl system for building templating systems',
-    release_status      => 'unstable',
-    configure_requires => {
-        'perl' => 5.008,
+    configure_requires => { 
         'Module::Build' => 0,
     },
     build_requires => {
-        'perl' => 5.008,
-        'Test::More' => 0,
+        'Test::More'    => 0,
+        'FindBin'       => 0,
     },
     requires => {
-        'perl' => 5.008,
-        'Scope::Upper' => 0,
-        'Class::ISA' => 0,
-        'Exporter' => 0,
+        'perl'                  => 5.008,
+        'Carp'                  => 0,
+        'Digest::MD5'           => 0,
+        'Exporter'              => 0,
         'File::Spec::Functions' => 0,
-        'Scalar::Util' => 0,
-        'IO::File' => 0,
-        'File::Find' => 0,
-        'Carp' => 0,
-        'Data::Dumper' => 0,
+        'HTML::Entities'        => 0,
+        'Scalar::Util'          => 0,
+        'Symbol'                => 0,
+        'URI::Escape'           => 0,
     },
-    add_to_cleanup     => [ 'Templ-*' ],
+    add_to_cleanup      => [ 'Templ-*' ],
     create_makefile_pl => 'traditional',
 );
 

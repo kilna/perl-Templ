@@ -5,22 +5,18 @@ use warnings;
 
 use Carp qw(cluck croak);
 use Data::Dumper;
+use Templ::Util qw(quote attempt default number_lines);
 
-my $PKG = __PACKAGE__;
-
-eval { require Perl::Tidy; require File::Temp };
-my $can_tidy = $@ ? 0 : 1;
-
-eval { require v5.10; };
-my $can_say = $@ ? 0 : 1; 
+my $can_tidy = attempt { require Perl::Tidy; require File::Temp };
+my $can_say = attempt { require v5.10; };
 
 sub new {
     my $class = shift;
     if ( not defined $class || ref $class || $class !~ m/^(\w+\:\:)*\w+$/ ) {
         croak "Can only be called as Templ::Parser::...->new";
     }
-    if ($class eq $PKG) {
-        croak "$PKG cannot be instantiated directly, use a subclass";
+    if ($class eq __PACKAGE__) {
+        croak "__PACKAGE__ cannot be instantiated directly, use a subclass";
     }
     my $self = bless {@_}, $class;
     return $self;
@@ -34,12 +30,9 @@ sub parse {
     # wrap the whole template in a header/footer, escaping the contents
     my $perl = '';
     if ($self->prettify) { $perl .= $self->pretty_header; }
-    my $quoted = $templ->templ_code;
-    $quoted =~ s|\\|\\\\|gs;
-    $quoted =~ s|'|\\'|gs;
     $perl .= $templ->header;
     $perl .= $self->header;
-    $perl .= "'$quoted'";
+    $perl .= "'".quote($templ->templ_code)."'";
     $perl .= $self->footer;
 
     # Loop over all of the remaining <* ... *> tag types, performing the
@@ -57,18 +50,18 @@ sub parse {
         # literal newlines in them to a series of individual print
         # or say statements for readability
         $perl =~ s{
-                (?:
-                    # $1 = Previous statement separator
-                    ( (?: ^ | \; | \{ | \} ) [ \t]*? (?:\r?\n)? )
-                    # $2 = Print statement indentation
-                    ( \s*? )
-                    # $3 = Double quote contents
-                    print \s* '(.*?)(?<!\\)'
-                    # $4 = Closing brace or semicolon
-                    ( \s* (?: (?:\;|\}) (?:\r?\n)? | $ ) )
-                )
-            }
-            { $self->prettify_lines($1, $2, $3, $4) }egsx;
+				(?:
+					# $1 = Previous statement separator
+					( (?: ^ | \; | \{ | \} ) [ \t]*? (?:\r?\n)? )
+					# $2 = Print statement indentation
+					( \s*? )
+					# $3 = Double quote contents
+					print \s* '(.*?)(?<!\\)'
+					# $4 = Closing brace or semicolon
+					( \s* (?: (?:\;|\}) (?:\r?\n)? | $ ) )
+				)
+			}
+			{ $self->prettify_lines($1, $2, $3, $4) }egsx;
     }
 
     if ( $self->tidy ) {
@@ -102,9 +95,7 @@ sub parse {
     }
 
     if ( $self->debug ) {
-        my @lines = split /\n/, $perl;
-        my $format = '%' . length( scalar(@lines) . '' ) . "s: %s\n";
-        print STDERR sprintf( $format, ( $_ + 1 ), $lines[$_] ) foreach (0 .. $#lines);
+        print STDERR number_lines($perl);
     }
 
     return $perl;
@@ -165,40 +156,30 @@ sub append_pretty { return ''; }
 sub footer        { die "Subclass must override Templ::Parser->footer"; }
 
 ##############################################################################
-# Utility Functions
-
-# Returns the first defined value in a list, or a blank string if there are
-# # no defined values
-sub _default (@) {
-    foreach (@_) { defined($_) && return $_; }
-    return '';
-}
-
-##############################################################################
 # Accessors...
 sub debug {
     my $self = shift;
     if ( defined $_[0] ) { $self->{'debug'} = shift; }
-    return _default $self->{'debug'}, $Templ::Parser::debug, 0;
+    return default $self->{'debug'}, $Templ::Parser::debug, 0;
 }
 
 sub tidy {
     my $self = shift;
     if ( defined $_[0] ) { $self->{'tidy'} = shift; }
-    return _default $self->{'tidy'}, $Templ::Parser::tidy, 0;
+    return default $self->{'tidy'}, $Templ::Parser::tidy, 0;
 }
 
 sub tidy_options {
     my $self = shift;
     if ( defined $_[0] ) { $self->{'tidy_options'} = shift; }
-    return _default $self->{'tidy_options'}, $Templ::Parser::tidy_options,
+    return default $self->{'tidy_options'}, $Templ::Parser::tidy_options,
         '-pbp -nst -b -aws -dws -dsm -nbbc -kbl=0 -asc -npro -sbl';
 }
 
 sub prettify {
     my $self = shift;
     if ( defined $_[0] ) { $self->{'prettify'} = shift; }
-    return _default $self->{'prettify'}, $Templ::Parser::prettify,
+    return default $self->{'prettify'}, $Templ::Parser::prettify,
         ( $self->tidy ? 1 : 0 );
 }
 

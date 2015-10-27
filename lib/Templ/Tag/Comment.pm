@@ -7,6 +7,7 @@ use warnings;
 sub perl {
     my $self    = shift;
     my $comment = shift;
+
     return join '', map {"# $_\n"} split /\n/, $comment;
 }
 
